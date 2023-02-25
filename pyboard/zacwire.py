@@ -50,3 +50,5 @@ class ZACwire():
 		
 	def T(self):
 		return self.rawT / 2047 * 70 - 10
+
+	# TODO: ADD START/STOP METHODS
