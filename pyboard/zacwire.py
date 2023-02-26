@@ -26,6 +26,7 @@ class ZACwire():
 		self.bufloc += 1
 
 	def cb_timer(self, _):
+		# this takes ~1 ms
 		self.timer.deinit()
 		self.bufloc = 0
 		self.decode()
