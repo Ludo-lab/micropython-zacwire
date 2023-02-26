@@ -30,8 +30,8 @@ class ZACwire():
 		self.decode()
 
 	def decode(self):
-		for k in range(zw.buflen-1):
-			self.dt[k] = ticks_diff(zw.buf[k+1], zw.buf[k])
+		for k in range(self.buflen-1):
+			self.dt[k] = ticks_diff(self.buf[k+1], self.buf[k])
 
 		threshold = self.dt[0]
 
