@@ -7,8 +7,10 @@ from micropython import schedule
 class ZACwire():
 
 	# values chosen to yield apparent temperatures below absolute zero:
-	_WRONG_PARITY   = -292107 # yields apparent temperature around -9999
-	_NO_READING_YET = -97174  # yields apparent temperature around -3333
+	_NO_READING_YET  = -97174   # yields apparent temperature around -3333
+	_WRONG_PARITY    = -64685   # yields apparent temperature around -2222
+	_LOW_RANGE_LIMIT = -32196   # yields apparent temperature around -1111
+	_HIGH_RANGE_LIMIT = -292107 # yields apparent temperature around -9999
 
 	def __init__(self, pin, timer = 1):
 		self.timer = Timer(timer)
@@ -67,6 +69,10 @@ class ZACwire():
 			self.rawT += self.bits[-12-k] << k+8
 
 	def T(self):
+		if self.rawT == 0:
+			return ZACwire._LOW_RANGE_LIMIT
+		elif self.rawT == 2047:
+			return ZACwire._HIGH_RANGE_LIMIT
 		return self.rawT / 2047 * 70 - 10
 
 	# TODO: ADD START/STOP METHODS
