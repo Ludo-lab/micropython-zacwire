@@ -19,6 +19,7 @@ class ZACwire():
 		self.rawT = 0
 
 	def cb_irq(self, _):
+		# this takes ~35 us if self.bufloc = 0, ~15 us otherwise
 		self.buf[self.bufloc] = micros()
 		if self.bufloc == 0:
 			self.timer.init(freq = 200, callback = self._cb_timer)
