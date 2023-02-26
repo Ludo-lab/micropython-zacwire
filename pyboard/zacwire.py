@@ -46,9 +46,9 @@ class ZACwire():
 		
 		self.rawT = self.bits[11]
 		for k in range(7):
-			self.rawT += self.bits[10-k] * 2**(k+1)
+			self.rawT += self.bits[10-k] << k+1
 		for k in range(3):
-			self.rawT += self.bits[2-k] * 2**(k+8)
+			self.rawT += self.bits[2-k] << k+8
 		
 	def T(self):
 		return self.rawT / 2047 * 70 - 10
