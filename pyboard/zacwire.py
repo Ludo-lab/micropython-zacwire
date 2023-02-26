@@ -7,12 +7,12 @@ from micropython import schedule
 class ZACwire():
 
 	# values chosen to yield apparent temperatures below absolute zero:
-	_NO_READING_YET  = -97174   # yields apparent temperature around -3333
-	_WRONG_PARITY    = -64685   # yields apparent temperature around -2222
-	_LOW_RANGE_LIMIT = -32196   # yields apparent temperature around -1111
-	_HIGH_RANGE_LIMIT = -292107 # yields apparent temperature around -9999
+	_NOT_RUNNING      = -97174   # yields apparent temperature around -3333
+	_WRONG_PARITY     = -64685   # yields apparent temperature around -2222
+	_LOW_RANGE_LIMIT  = -32196   # yields apparent temperature around -1111
+	_HIGH_RANGE_LIMIT = -292107  # yields apparent temperature around -9999
 
-	def __init__(self, pin, timer = 1):
+	def __init__(self, pin, timer = 1, start = True):
 		self.timer = Timer(timer)
 		self.bufloc = 0
 		self.buflen = 41
@@ -22,9 +22,11 @@ class ZACwire():
 		self._cb_timer = self.cb_timer
 		self._decode = self.decode
 		self.ei = ExtInt(pin, ExtInt.IRQ_RISING_FALLING, Pin.PULL_NONE, self._cb_irq)
+		if not start:
+			self.ei.disable()
 		self.bitslen = 14
 		self.bits = array('b', [0]*self.bitslen)
-		self.rawT = ZACwire._NO_READING_YET
+		self.rawT = ZACwire._NOT_RUNNING
 
 	def cb_irq(self, _):
 		# this takes ~35 us if self.bufloc = 0, ~15 us otherwise
@@ -68,11 +70,16 @@ class ZACwire():
 		for k in range(3):
 			self.rawT += self.bits[-12-k] << k+8
 
+	def start(self):
+		self.ei.enable()
+
+	def stop(self):
+		self.ei.disable()
+		self.rawT = ZACwire._NOT_RUNNING
+
 	def T(self):
 		if self.rawT == 0:
 			return ZACwire._LOW_RANGE_LIMIT
 		elif self.rawT == 2047:
 			return ZACwire._HIGH_RANGE_LIMIT
 		return self.rawT / 2047 * 70 - 10
-
-	# TODO: ADD START/STOP METHODS
