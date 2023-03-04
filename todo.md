@@ -1,0 +1,1 @@
+* port features of the RP2040 driver (`errorcount`, etc) to the pyboard driver
