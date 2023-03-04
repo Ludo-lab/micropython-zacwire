@@ -29,7 +29,7 @@ The `timeout` argument defaults to `3`. This indicates the maximum number of **c
 
 ## Testing
 
-To test long-term behavior, one may use the example above, which will report comma-separated values of temperature and `errorcount`. To plot these values in real time, one may use something like [polt]():
+To test long-term behavior, one may use the example above, which will report comma-separated values of temperature and `errorcount`. To plot these values in real time, one may use something like [polt](https://gitlab.com/nobodyinperson/python3-polt):
 
 ```sh
 # /dev/cu.usbmodemXXXX is the port used to listen to the RP2040
