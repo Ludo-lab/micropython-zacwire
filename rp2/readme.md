@@ -4,9 +4,9 @@
 
 This use two state machines:
 
-* The first one (`sm0`) reports the low pulses durations out of the TSic.
+* The first one (`sm0`) raises an IRQ when it reports the low pulses durations out of the TSic. These pulses are stored in a buffer array `buf`.
 * The second state machine (`sm1`) raises an IRQ when it detects a high pulse longer than ~5 ms, which only happens in between temperature readings.
-* The callback to that IRQ starts a DMA transfer which will copy the next twenty pulse durations reported by `sm0` and write them to a buffer array `dmabuf`. It also schedules the decoding of `dmabuf` into a temperature reading
+* The callback to that IRQ saves a copy of `buf` to another buffer array `savedbuf`. It also schedules the decoding of `savedbuf` into a temperature reading.
 
 ## Usage
 
@@ -14,7 +14,7 @@ This use two state machines:
 from time import sleep_ms
 from zacwire import ZACwire
 
-zw = ZACwire(pin = 16, start = True, filter = 3, timeout = 3)
+zw = ZACwire(pin = 16, start = True, filter = 3, timeout = 5)
 
 while True:
 	sleep_ms(125)
@@ -25,7 +25,7 @@ The `start` argument (`False` by default) controls whether to start readings rig
 
 The `filter` argument defaults to `1`. Values larger than 1 indicate that a median filter should be applied over the last `N = filter` valid temperature readings. This will help ignore outliers but will also apply a low-pass filter to the readings: readings being performed at a rate of ~10 Hz, specifying `filter = 5` will filter the signal with a cutoff at about 2 Hz.
 
-The `timeout` argument defaults to `3`. This indicates the maximum number of **consecutive** problematic readings (parity error, low or high range limits) before raising an exception. `ZACwire.errorcount` indicates how many such errors occurred (even if they did not cause an exception to be raised) since this instance of `ZACwire()` was initialized.
+The `timeout` argument defaults to `3`. This indicates the maximum number of **consecutive** problematic readings (parity error, low or high range limits) before raising an exception. `ZACwire.errorcount` indicates how many such errors occurred (even if they did not cause an exception to be raised) since this instance of `ZACwire()` was initialized. In practice, most of these are parity errors.
 
 ## Testing
 
